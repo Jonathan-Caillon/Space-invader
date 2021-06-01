@@ -1,0 +1,161 @@
+
+
+
+
+
+
+
+function Sprite( filename, left, top ){             // Met fichier en image et definit sa position
+    this._node = document.createElement("img");
+    this._node.src = filename;
+    this._node.style.position = "absolute";
+    document.body.appendChild(this._node);
+
+    Object.defineProperty(this, "left", {           // Position X
+        get: function() {
+            return this._left;
+        },
+        set: function(value) {
+            this._left = value;
+            this._node.style.left = value + "px"
+        }
+    })
+
+    Object.defineProperty(this, "top", {            // Position Y
+        get: function() {
+            return this._top;
+        },
+        set: function(value) {
+            this._top = value;
+            this._node.style.top = value + "px"
+        }
+    })
+
+    Object.defineProperty(this, "display", {        // Visible ou Non
+        get: function() {
+            return this._node.style.display;
+        },
+        set: function(value) {
+            this._top = value;
+            this._node.style.display = value
+        }
+    })
+
+    this.left = left;
+    this.top = top;
+
+}
+
+Sprite.prototype.startAnimation = function (fct, interval) {
+    if (this._clock) window.clearInterval(this._clock);
+    let _this = this;
+    this._clock = window.setInterval (function() {
+        fct(_this);
+    }, interval);
+}
+
+Sprite.prototype.stopAnimation = function() {
+    window.clearInterval(this._clock);
+}
+
+
+
+
+
+let beam = new Sprite("./images/vaisseau/beam.png", 0, 0)
+let vaisseau = new Sprite("./images/vaisseau/spaceship.png", 400, 400)
+let alien1 = new Sprite("./images/alien/flash_1.png", 100, 50)
+let alien2 = new Sprite("./images/alien/flash_2.png", 300, 50)
+let alien3 = new Sprite("./images/alien/flash_3.png", 500, 50)
+let alien4 = new Sprite("./images/alien/flash_4.png", 700, 50)
+let alien5 = new Sprite("./images/alien/flash_5.png", 900, 50)
+
+beam.display = "none"
+
+document.onkeydown = function(KeyboardEvent) {
+    console.log(KeyboardEvent.code); // permet de recuperer le code correspondant a la touche appuyer
+    if (KeyboardEvent.code == "KeyW") { // Z pour avancer
+        vaisseau.top -= 10
+    }
+    else if (KeyboardEvent.code == "KeyS") { // S pour reculer
+        vaisseau.top += 10
+    }
+    else if (KeyboardEvent.code == "KeyD") { // D pour aller a droite
+        vaisseau.left += 10
+    }
+    else if (KeyboardEvent.code == "KeyA") { // Q pour aller a gauche
+        vaisseau.left -= 10
+    }
+
+    if (vaisseau.left < 0) {
+        vaisseau.left = 0;
+    }
+    if (vaisseau.left > document.body.clientWidth - vaisseau._node.width) {
+        vaisseau.left = document.body.clientWidth - vaisseau._node.width;
+    }
+    if (vaisseau.top < 0) {
+        vaisseau.top = 0;
+    }
+    if (vaisseau.top > document.body.clientHeight - vaisseau._node.height) {
+        vaisseau.top = document.body.clientHeight - vaisseau._node.height;
+    }
+
+    if (KeyboardEvent.code == "Space") {
+        if (beam.display == "none") {
+            beam.display = "block";
+            beam.left = vaisseau.left + (vaisseau._node.width - beam._node.width) / 2;
+            beam.top = vaisseau.top;
+            beam.startAnimation(moveBeam, 20);
+        }
+    }
+}
+
+for(let i=1; i<=5; i++) {
+    let tab = "alien" + i
+    
+    console.log(typeof tab);
+
+    tab.startAnimation(moveAlienToRight, 20);
+}
+
+
+function moveBeam (beam) {
+    beam.top -= 10;
+    if (beam.top < -40) {
+        beam.stopAnimation();
+        beam.display = "none"
+    }
+
+}
+
+function moveAlienToRight (alien) {
+    alien.left += 4
+    if(alien.left > document.body.clientWidth - alien._node.width) {
+        alien.top += 100;
+        alien.startAnimation(moveAlienToLeft, 20)
+    }
+}
+
+function moveAlienToLeft (alien) {
+    alien.left -= 4
+    if(alien.left <= 0) {
+        alien.top += 100;
+        alien.startAnimation(moveAlienToRight, 20)
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// alien1.startAnimation(moveAlienToRight, 20);
+// alien2.startAnimation(moveAlienToRight, 20);
+// alien3.startAnimation(moveAlienToRight, 20);
+// alien4.startAnimation(moveAlienToRight, 20);
+// alien5.startAnimation(moveAlienToRight, 20);
