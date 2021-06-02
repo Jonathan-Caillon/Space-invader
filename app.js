@@ -157,7 +157,10 @@ function moveAlienToRight (alien) {
         alien.startAnimation(moveAlienToLeft, 10)
     }
     if (vaisseau.checkCollision(alien)) {
-        vaisseau.display = "none"
+        vaisseau.top = -100
+        alert ("Game over")
+        document.location.reload(true);
+        
     }
 }
 
@@ -168,7 +171,9 @@ function moveAlienToLeft (alien) {
         alien.startAnimation(moveAlienToRight, 10)
     }
     if (vaisseau.checkCollision(alien)) {
-        vaisseau.display = "none"
+        vaisseau.top = -100
+        alert ("Game over")
+        document.location.reload(true);
     }
 }
 
