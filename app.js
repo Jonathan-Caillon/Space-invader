@@ -11,7 +11,7 @@ function Sprite( filename, left, top ){             // Met fichier en image et d
         },
         set: function(value) {
             this._left = value;
-            this._node.style.left = value + "px"
+            this._node.style.left = value + "px";
         }
     })
 
@@ -21,7 +21,7 @@ function Sprite( filename, left, top ){             // Met fichier en image et d
         },
         set: function(value) {
             this._top = value;
-            this._node.style.top = value + "px"
+            this._node.style.top = this._top + "px"
         }
     })
 
@@ -30,7 +30,6 @@ function Sprite( filename, left, top ){             // Met fichier en image et d
             return this._node.style.display;
         },
         set: function(value) {
-            this._top = value;
             this._node.style.display = value
         }
     })
@@ -60,12 +59,18 @@ Sprite.prototype.checkCollision = function(other) {
 
 let beam = new Sprite("./images/vaisseau/beam.png", 0, 0)
 beam.display = "none"
-let vaisseau = new Sprite("./images/vaisseau/spaceship.png", 700, 700)
+let vaisseau = new Sprite("./images/vaisseau/spaceship.png", 600, 600)
 let explosion = []
-explosion.display = "none"
+let haut = false
+let gauche = false
+let droite = false
+let bas = false
+let alien = [] 
+
 
 document.onkeydown = function(KeyboardEvent) {
     console.log(KeyboardEvent.code); // permet de recuperer le code correspondant a la touche appuyer
+
     if (KeyboardEvent.code == "KeyW") { // Z pour avancer
         vaisseau.top -= 10
     }
@@ -97,18 +102,21 @@ document.onkeydown = function(KeyboardEvent) {
             beam.display = "block";
             beam.left = vaisseau.left + (vaisseau._node.width - beam._node.width) / 2;
             beam.top = vaisseau.top;
-            beam.startAnimation(moveBeam, 1);
+            beam.startAnimation(moveBeam, 10);
         }
     }
 }
 
-let aliens = []    // Tableau des vaisseaux aliens
+
+
+   // Tableau des vaisseaux aliens
 
 for(let i=1; i<=15; i++) {      // 15 vaisseaux
-    aliens[i] = new Sprite("./images/alien/flash_" + (Math.floor(Math.random()*5) + 1) +".png",+ (Math.floor(Math.random()*1000) + 1), + (Math.floor(Math.random()*200) + 1))
-    explosion[i] = new Sprite("./images/explosion/explosion"+ i +".gif", 0, 0)
+    alien[i] = new Sprite("./images/alien/flash_" + (Math.floor(Math.random()*5) + 1) +".png",+ (Math.floor(Math.random()*1000) + 1), + (Math.floor(Math.random()*200) + 1))
+    explosion[i] = new Sprite("./images/explosion/explosion1.gif"+"?a="+Math.random() , 0, 0)
     explosion[i].display = "none"
-    aliens[i].startAnimation(moveAlienToRight, 10);
+    alien[i].startAnimation(moveAlienToRight, 10);
+
 }
 
 
@@ -120,17 +128,17 @@ function moveBeam (beam) {
     }
 
     for(let i=1; i<=15; i++) {
-        if (aliens[i].display == "none") continue;
-        if (beam.checkCollision(aliens[i])) {
+        if (alien[i].display == "none") continue;
+        if (beam.checkCollision(alien[i])) {
             beam.stopAnimation();
             beam.display = "none"
-            aliens[i].stopAnimation();
-            explosion[i].left = aliens[i].left;
-            explosion[i].top = aliens[i].top;
-            aliens[i].display = "none"
+            alien[i].stopAnimation();
+            explosion[i].left = alien[i].left;
+            explosion[i].top = alien[i].top;
+            alien[i].display = "none"
             explosion[i].display = "block"
             setDelay(i)
-
+            console.log(beam.checkCollision(alien[i]))
         }
     }
 
@@ -139,14 +147,17 @@ function moveBeam (beam) {
 function setDelay(i) {
     setTimeout(function(){
         explosion[i].display = "none";
-    }, 3000);
-  }
+    }, 1600);
+}
 
 function moveAlienToRight (alien) {
     alien.left += 2
     if(alien.left > document.body.clientWidth - alien._node.width) {
         alien.top += 100;
         alien.startAnimation(moveAlienToLeft, 10)
+    }
+    if (vaisseau.checkCollision(alien)) {
+        vaisseau.display = "none"
     }
 }
 
@@ -155,6 +166,9 @@ function moveAlienToLeft (alien) {
     if(alien.left <= 0) {
         alien.top += 100;
         alien.startAnimation(moveAlienToRight, 10)
+    }
+    if (vaisseau.checkCollision(alien)) {
+        vaisseau.display = "none"
     }
 }
 
